@@ -17,7 +17,7 @@ from PyQt6.QtWidgets import (
     QProgressBar,
     QGroupBox,
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QSettings
 
 
 class PDFCreateWorker(QThread):
@@ -207,6 +207,14 @@ class CreateWindow(QWidget):
     def on_finished(self, path):
         self.progress.setVisible(False)
         self.save_btn.setEnabled(True)
+        
+        settings = QSettings("PDFMaster", "PDFMaster")
+        recent = settings.value("recent_files", [])
+        if path not in recent:
+            recent.insert(0, path)
+            recent = recent[:10]
+            settings.setValue("recent_files", recent)
+        
         QMessageBox.information(self, "✅ Success", f"PDF saved to:\n{path}")
         self.clear()
 

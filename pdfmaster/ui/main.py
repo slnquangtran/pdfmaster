@@ -19,6 +19,8 @@ from PyQt6.QtWidgets import (
     QStatusBar,
     QMessageBox,
     QToolBar,
+    QSpacerItem,
+    QSizePolicy,
 )
 from PyQt6.QtGui import QAction, QIcon, QColor, QPalette
 
@@ -110,6 +112,7 @@ class MainWindow(QMainWindow):
         actions = QPushButton("⚡ Quick Actions")
         actions.setObjectName("secondaryButton")
         actions.setProperty("secondary", True)
+        actions.clicked.connect(self.show_quick_actions)
         header_layout.addWidget(actions)
         
         content_layout.addWidget(header)
@@ -219,11 +222,52 @@ class MainWindow(QMainWindow):
             self.status_bar.showMessage(f"Opened: {file_path}")
     
     def show_settings(self):
-        QMessageBox.information(
-            self,
-            "Settings",
-            "Settings panel coming soon!\n\nTheme: " + self.current_theme.title()
-        )
+        from pdfmaster.ui.widgets.recent_files import RecentFilesWidget
+        
+        from PyQt6.QtWidgets import QDialog, QDialogButtonBox
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle("⚙️ Settings")
+        layout = QVBoxLayout()
+        
+        title = QLabel("📋 Recent Files")
+        title.setObjectName("pageTitle")
+        layout.addWidget(title)
+        
+        self.recent_widget = RecentFilesWidget()
+        layout.addWidget(self.recent_widget)
+        
+        clear_btn = QPushButton("🗑️ Clear Recent Files")
+        clear_btn.setObjectName("secondaryButton")
+        clear_btn.setProperty("secondary", True)
+        clear_btn.clicked.connect(self.recent_widget.clear_recent)
+        layout.addWidget(clear_btn)
+        
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
+        
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        buttons.accepted.connect(dialog.accept)
+        layout.addWidget(buttons)
+        
+        dialog.setLayout(layout)
+        dialog.exec()
+    
+    def show_quick_actions(self):
+        from PyQt6.QtWidgets import QMenu
+        menu = QMenu(self)
+        
+        menu.addAction("📄 Create New PDF", lambda: self.sidebar.setCurrentRow(0))
+        menu.addAction("🔄 Convert Files", lambda: self.sidebar.setCurrentRow(1))
+        menu.addAction("📝 Extract Text", lambda: self.sidebar.setCurrentRow(2))
+        menu.addAction("🗄️ Extract SQL Schema", lambda: self.sidebar.setCurrentRow(3))
+        
+        menu.addSeparator()
+        menu.addAction("📂 Open File", self.open_file)
+        
+        from PyQt6.QtWidgets import QPushButton
+        btn = self.sender()
+        if btn:
+            menu.exec(btn.mapToGlobal(btn.rect().bottomLeft()))
 
     def show_about(self):
         QMessageBox.about(
