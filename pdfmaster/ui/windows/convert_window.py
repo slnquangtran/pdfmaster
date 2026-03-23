@@ -14,8 +14,9 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QLineEdit,
+    QGroupBox,
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal, QMimeData
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent
 
 
@@ -51,27 +52,17 @@ class FileDropWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
+        self.setObjectName("dropZone")
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(30, 30, 30, 30)
         self.setLayout(layout)
 
-        self.setStyleSheet("""
-            QWidget {
-                border: 2px dashed #aaa;
-                border-radius: 10px;
-                background-color: #f9f9f9;
-            }
-            QWidget:drop {
-                border: 2px solid #4CAF50;
-                background-color: #e8f5e9;
-            }
-        """)
-
-        self.label = QLabel("Drag & Drop files here\nor click to browse")
+        self.label = QLabel("📁 Drag & Drop files here\nor click to browse")
+        self.label.setObjectName("dropLabel")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("color: #666; padding: 40px;")
         layout.addWidget(self.label)
 
         self.setMinimumHeight(150)
@@ -79,12 +70,12 @@ class FileDropWidget(QWidget):
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
-            self.label.setText("Drop files here!")
-            self.label.setStyleSheet("color: #4CAF50; padding: 40px;")
+            self.label.setText("📥 Drop files here!")
+            self.setObjectName("dropZoneActive")
 
     def dragLeaveEvent(self, event):
-        self.label.setText("Drag & Drop files here\nor click to browse")
-        self.label.setStyleSheet("color: #666; padding: 40px;")
+        self.label.setText("📁 Drag & Drop files here\nor click to browse")
+        self.setObjectName("dropZone")
 
     def dropEvent(self, event: QDropEvent):
         files = []
@@ -92,6 +83,7 @@ class FileDropWidget(QWidget):
             files.append(url.toLocalFile())
         if files:
             self.files_dropped.emit(files)
+        self.setObjectName("dropZone")
 
     def mousePressEvent(self, event):
         files, _ = QFileDialog.getOpenFileNames(
@@ -113,52 +105,79 @@ class ConvertWindow(QWidget):
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        layout.setSpacing(20)
         self.setLayout(layout)
 
-        title_label = QLabel("Convert Files to PDF")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        layout.addWidget(title_label)
+        settings_group = QGroupBox("Output Settings")
+        settings_group.setObjectName("settingsGroup")
+        settings_layout = QHBoxLayout()
+        settings_group.setLayout(settings_layout)
+        layout.addWidget(settings_group)
 
-        output_layout = QHBoxLayout()
-        output_layout.addWidget(QLabel("Output Directory:"))
+        output_label = QLabel("📂 Output Directory:")
+        output_label.setObjectName("fieldLabel")
+        settings_layout.addWidget(output_label)
+
         self.output_dir_input = QLineEdit()
+        self.output_dir_input.setObjectName("inputField")
         self.output_dir_input.setText(str(Path.home() / "Documents"))
-        output_layout.addWidget(self.output_dir_input)
-        
-        browse_btn = QPushButton("Browse")
+        settings_layout.addWidget(self.output_dir_input, 1)
+
+        browse_btn = QPushButton("📂 Browse")
+        browse_btn.setObjectName("secondaryButton")
+        browse_btn.setProperty("secondary", True)
         browse_btn.clicked.connect(self.browse_output_dir)
-        output_layout.addWidget(browse_btn)
-        layout.addLayout(output_layout)
+        settings_layout.addWidget(browse_btn)
+
+        files_group = QGroupBox("Files to Convert")
+        files_group.setObjectName("filesGroup")
+        files_layout = QVBoxLayout()
+        files_layout.setSpacing(10)
+        files_group.setLayout(files_layout)
+        layout.addWidget(files_group, 1)
 
         self.drop_widget = FileDropWidget()
         self.drop_widget.files_dropped.connect(self.add_files)
-        layout.addWidget(self.drop_widget)
+        files_layout.addWidget(self.drop_widget)
 
         self.file_list = QListWidget()
+        self.file_list.setObjectName("fileList")
         self.file_list.setMinimumHeight(150)
-        layout.addWidget(self.file_list)
+        files_layout.addWidget(self.file_list)
 
         list_buttons = QHBoxLayout()
-        remove_btn = QPushButton("Remove Selected")
+        
+        remove_btn = QPushButton("❌ Remove Selected")
+        remove_btn.setObjectName("secondaryButton")
+        remove_btn.setProperty("secondary", True)
         remove_btn.clicked.connect(self.remove_selected)
-        clear_btn = QPushButton("Clear All")
-        clear_btn.clicked.connect(self.clear_files)
         list_buttons.addWidget(remove_btn)
+
+        clear_btn = QPushButton("🗑️ Clear All")
+        clear_btn.setObjectName("secondaryButton")
+        clear_btn.setProperty("secondary", True)
+        clear_btn.clicked.connect(self.clear_files)
         list_buttons.addWidget(clear_btn)
+
         list_buttons.addStretch()
-        layout.addLayout(list_buttons)
+        files_layout.addLayout(list_buttons)
 
         self.progress = QProgressBar()
+        self.progress.setObjectName("progressBar")
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        self.status_label = QLabel()
+        self.status_label = QLabel("💡 Add files to convert them to PDF")
+        self.status_label.setObjectName("statusLabel")
         layout.addWidget(self.status_label)
 
         button_layout = QHBoxLayout()
-        convert_btn = QPushButton("Convert All")
+        
+        convert_btn = QPushButton("⚡ Convert All to PDF")
+        convert_btn.setObjectName("primaryButton")
         convert_btn.clicked.connect(self.convert_files)
         button_layout.addWidget(convert_btn)
+        
         button_layout.addStretch()
         layout.addLayout(button_layout)
 
@@ -171,7 +190,7 @@ class ConvertWindow(QWidget):
         for f in files:
             if f not in self.files:
                 self.files.append(f)
-                self.file_list.addItem(Path(f).name)
+                self.file_list.addItem(f"📄 {Path(f).name}")
         self.update_status()
 
     def remove_selected(self):
@@ -187,7 +206,7 @@ class ConvertWindow(QWidget):
         self.update_status()
 
     def update_status(self):
-        self.status_label.setText(f"{len(self.files)} file(s) ready to convert")
+        self.status_label.setText(f"📊 {len(self.files)} file(s) ready to convert")
 
     def convert_files(self):
         if not self.files:
@@ -209,15 +228,15 @@ class ConvertWindow(QWidget):
         self.progress.setVisible(True)
         self.progress.setMaximum(total)
         self.progress.setValue(current)
-        self.status_label.setText(f"Converting {current} of {total}...")
+        self.status_label.setText(f"🔄 Converting {current} of {total}...")
 
     def on_file_finished(self, filename, success, result):
         if success:
-            self.status_label.setText(f"Converted: {filename} -> {result}")
+            self.status_label.setText(f"✅ Converted: {Path(filename).name}")
         else:
-            self.status_label.setText(f"Failed: {filename} - {result}")
+            self.status_label.setText(f"❌ Failed: {Path(filename).name}")
 
     def on_all_finished(self):
         self.progress.setVisible(False)
-        QMessageBox.information(self, "Complete", "All files have been converted!")
+        QMessageBox.information(self, "🎉 Complete", "All files have been converted!")
         self.clear_files()
