@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
                 "🎨  Create PDF",
                 "🔄  Convert Files",
                 "🔗  Merge/Split",
+                "✏️  Design PDF",
                 "📝  Extract Text",
                 "🗄️  Extract SQL",
             ]
@@ -124,18 +125,21 @@ class MainWindow(QMainWindow):
         from pdfmaster.ui.windows.create_window import CreateWindow
         from pdfmaster.ui.windows.convert_window import ConvertWindow
         from pdfmaster.ui.windows.merge_window import MergeWindow
+        from pdfmaster.ui.windows.design_window import DesignWindow
         from pdfmaster.ui.windows.extract_window import ExtractWindow
         from pdfmaster.ui.windows.extract_schema_window import ExtractSchemaWindow
 
         self.create_window = CreateWindow()
         self.convert_window = ConvertWindow()
         self.merge_window = MergeWindow()
+        self.design_window = DesignWindow()
         self.extract_window = ExtractWindow()
         self.extract_schema_window = ExtractSchemaWindow()
 
         self.pages.addWidget(self.create_window)
         self.pages.addWidget(self.convert_window)
         self.pages.addWidget(self.merge_window)
+        self.pages.addWidget(self.design_window)
         self.pages.addWidget(self.extract_window)
         self.pages.addWidget(self.extract_schema_window)
 
@@ -146,7 +150,7 @@ class MainWindow(QMainWindow):
         self.status_bar = QStatusBar()
         self.status_bar.setObjectName("statusBar")
         self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("Ready • PDF Master v1.1.0")
+        self.status_bar.showMessage("Ready • PDF Master v2.0.0")
 
     def setup_menu(self):
         menubar = self.menuBar()
@@ -194,6 +198,7 @@ class MainWindow(QMainWindow):
             "Create PDF",
             "Convert Files",
             "Merge/Split PDFs",
+            "Design PDF",
             "Extract Text",
             "Extract SQL Schema",
         ]
@@ -271,8 +276,9 @@ class MainWindow(QMainWindow):
         menu.addAction("📄 Create New PDF", lambda: self.sidebar.setCurrentRow(0))
         menu.addAction("🔄 Convert Files", lambda: self.sidebar.setCurrentRow(1))
         menu.addAction("🔗 Merge/Split PDFs", lambda: self.sidebar.setCurrentRow(2))
-        menu.addAction("📝 Extract Text", lambda: self.sidebar.setCurrentRow(3))
-        menu.addAction("🗄️ Extract SQL Schema", lambda: self.sidebar.setCurrentRow(4))
+        menu.addAction("✏️ Design PDF", lambda: self.sidebar.setCurrentRow(3))
+        menu.addAction("📝 Extract Text", lambda: self.sidebar.setCurrentRow(4))
+        menu.addAction("🗄️ Extract SQL Schema", lambda: self.sidebar.setCurrentRow(5))
 
         menu.addSeparator()
         menu.addAction("📂 Open File", self.open_file)
@@ -287,14 +293,17 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "About PDF Master",
-            "📄 PDF Master v1.1.0 - Premium Edition\n\n"
-            "A comprehensive PDF application for creation, "
-            "editing, conversion, merging, and extraction.\n\n"
+            "📄 PDF Master v2.0.0 - Premium Edition\n\n"
+            "A comprehensive PDF application for creation, editing, "
+            "conversion, merging, and professional document design.\n\n"
             "✨ Premium Features:\n"
             "- Modern Dark/Light Theme\n"
             "- Quick Actions Panel\n"
             "- PDF Merge & Split\n"
-            "- Enhanced User Experience\n\n"
+            "- Watermarks & Stamps\n"
+            "- Page Numbers & Headers\n"
+            "- Table of Contents\n"
+            "- Professional Design Tools\n\n"
             "© 2026 PDF Master Team",
         )
 
