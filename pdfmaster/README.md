@@ -138,3 +138,8 @@ schema = generator.extract("data.pdf")
 ## License
 
 MIT
+
+## CI
+
+- This project uses GitHub Actions to run tests and lint checks on pull requests.
+- You can see the pipeline at .github/workflows/ci.yml.
