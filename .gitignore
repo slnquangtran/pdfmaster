@@ -1,11 +1,15 @@
+# Python cache and artifacts
 __pycache__/
+**/__pycache__/
 *.pyc
-*.pyo
-*.egg-info/
+**/*.pyc
+
+# PyInstaller and packaging leftovers
 dist/
 build/
-*.log
+.spec
+
+# OS/IDE files
 .DS_Store
-*.pdf
-*.spec
-nul
+.vscode/
+.idea/
