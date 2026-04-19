@@ -139,6 +139,28 @@ def extract_table(input: str, output_dir: str):
         df.to_csv(out_file, index=False)
         click.echo(f"Wrote table to {out_file}")
 
+@main.command()
+@click.argument("input", type=click.Path(exists=True))
+@click.option("--output-dir", "-o", required=True, help="Output directory for image exports")
+@click.option("--page", type=int, default=1, help="Page number to export as image (1-based)")
+def export_page_image(input: str, output_dir: str, page: int):
+    """Export a single PDF page to an image (PNG)."""
+    import fitz
+    from pathlib import Path
+    input_path = Path(input)
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    doc = fitz.open(str(input_path))
+    if page < 1 or page > doc.page_count:
+        doc.close()
+        raise click.ClickException(f"Invalid page number: {page}")
+    p = doc[page - 1]
+    pix = p.get_pixmap()
+    out_file = out_dir / f"{input_path.stem}_page_{page}.png"
+    pix.save(str(out_file))
+    doc.close()
+    click.echo(f"Exported page {page} to {out_file}")
+
 
 @main.command()
 @click.argument("input", type=click.Path(exists=True))
