@@ -24,9 +24,10 @@ class TextExtractor:
             doc.close()
             raise ValueError("PDF is encrypted")
 
+        total_pages = len(doc)
         text_parts = []
 
-        for page_num in range(len(doc)):
+        for page_num in range(total_pages):
             page = doc[page_num]
 
             if self.preserve_formatting:
@@ -40,7 +41,7 @@ class TextExtractor:
         doc.close()
 
         result = "\n\n".join(text_parts)
-        logger.info(f"Extracted text from {len(doc)} pages")
+        logger.info(f"Extracted text from {total_pages} pages")
         return result
 
     def _extract_with_formatting(self, page: fitz.Page) -> str:
