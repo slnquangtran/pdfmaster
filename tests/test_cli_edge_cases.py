@@ -11,6 +11,18 @@ def _make_pdf(tmp_dir, name="edge_case.pdf", text="Edge Case"):
     creator.save(str(p))
     return p
 
+def _make_multi_page_pdf(tmp_dir, name="multi_page.pdf"):
+    p = Path(tmp_dir) / name
+    from pdfmaster.src.core.creator import PDFCreator
+    creator = PDFCreator(title="MultiPage", author="Tester")
+    creator.add_text("Page 1", x=72, y=700, font_size=12)
+    creator.new_page()
+    creator.add_text("Page 2", x=72, y=700, font_size=12)
+    creator.new_page()
+    creator.add_text("Page 3", x=72, y=700, font_size=12)
+    creator.save(str(p))
+    return p
+
 
 def test_merge_no_inputs_error():
     runner = CliRunner()
@@ -56,3 +68,13 @@ def test_watermark_cli(tmp_path):
     result = runner.invoke(cli_main, ["watermark", str(pdf), str(out), "--text", "CONFIDENTIAL"])
     assert result.exit_code == 0
     assert out.exists()
+def test_export_all_pages_image_cli(tmp_path):
+    # Create a 3-page PDF
+    pdf = _make_multi_page_pdf(tmp_path, name="multi_page.pdf")
+    out_dir = tmp_path / "all_pages_images"
+    runner = CliRunner()
+    from pdfmaster.src.cli import main as cli_main
+    result = runner.invoke(cli_main, ["export-all-pages-image", str(pdf), "-o", str(out_dir)])
+    assert result.exit_code == 0
+    pngs = [f for f in os.listdir(out_dir) if f.endswith('.png')]
+    assert len(pngs) == 3

@@ -161,6 +161,28 @@ def export_page_image(input: str, output_dir: str, page: int):
     doc.close()
     click.echo(f"Exported page {page} to {out_file}")
 
+
+@main.command()
+@click.argument("input", type=click.Path(exists=True))
+@click.option("--output", "-o", required=True, help="Output directory for all page images")
+def export_all_pages_image(input: str, output: str):
+    """Export all PDF pages to separate PNG images."""
+    import fitz
+    from pathlib import Path
+    input_path = Path(input)
+    out_dir = Path(output)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    doc = fitz.open(str(input_path))
+    total = doc.page_count
+    stem = input_path.stem
+    for i in range(total):
+        page = doc[i]
+        pix = page.get_pixmap()
+        out_file = out_dir / f"{stem}_page_{i+1}.png"
+        pix.save(str(out_file))
+    doc.close()
+    click.echo(f"Exported {total} pages to {out_dir}")
+
 @main.command()
 @click.argument("input", type=click.Path(exists=True))
 @click.argument("output", type=click.Path())
