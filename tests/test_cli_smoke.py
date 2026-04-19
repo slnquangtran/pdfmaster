@@ -13,5 +13,5 @@ def test_cli_commands_exist():
     # Ensure the expected subcommands exist on the CLI group
     from pdfmaster.src.cli import main as cli_main
     commands = getattr(cli_main, 'commands', {})
-    for name in ["create", "convert", "extract-text", "extract-schema", "batch-convert"]:
+    for name in ["create", "convert", "extract-text", "extract-schema", "batch-convert", "merge", "split", "extract-table"]:
         assert name in commands or name.replace('-', '_') in commands

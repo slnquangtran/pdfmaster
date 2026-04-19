@@ -160,6 +160,16 @@ def extract_text(input: str, output: str, encoding: str):
         logger.error(f"Text extraction failed: {e}")
         raise click.ClickException(str(e))
 
+@main.command()
+@click.argument("input", type=click.Path(exists=True))
+@click.option("--chars", default=500, help="Number of characters to preview from extracted text")
+def preview_text(input: str, chars: int):
+    """Preview first N characters of extracted text from a PDF."""
+    from pdfmaster.src.extractors.text_extractor import TextExtractor
+    extractor = TextExtractor()
+    text = extractor.extract(input)
+    preview = text[: max(0, chars)]
+    click.echo(preview)
 
 @main.command()
 @click.argument("input", type=click.Path(exists=True))
