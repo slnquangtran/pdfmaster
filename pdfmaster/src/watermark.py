@@ -12,7 +12,7 @@ def add_watermark(
     text: str,
     font_size: int = 60,
     color: tuple = (0.75, 0.75, 0.75),
-    rotate: float = 45.0,
+    rotate: float = 0.0,
 ) -> Path:
     input_path = Path(input_path) if isinstance(input_path, str) else input_path
     output_path = Path(output_path) if isinstance(output_path, str) else output_path
@@ -22,7 +22,8 @@ def add_watermark(
     for page in doc:
         # Draw a large, light watermark across the page
         rect = page.rect
-        page.insert_textbox(rect, text, fontsize=font_size, rotate=rotate, color=color, align=1)
+        # Avoid using rotate if the API does not support it in your PyMuPDF version
+        page.insert_textbox(rect, text, fontsize=font_size, color=color, align=1)
     doc.save(str(output_path))
     doc.close()
     logger.info(f"Watermark applied: {output_path}")
