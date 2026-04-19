@@ -85,16 +85,16 @@ class ImageConverter(BaseConverter):
         width, height = letter
 
         img_width, img_height = img.size
-        aspect = img_height / img_width
+        aspect = img_height / img_width if img_width != 0 else 1
 
         draw_width = width - 100
         draw_height = draw_width * aspect
 
         if draw_height > height - 100:
             draw_height = height - 100
-            draw_width = draw_height / aspect
+            draw_width = draw_height / aspect if aspect != 0 else width
 
-        c.draw_image(
+        c.drawImage(
             str(input_path),
             50,
             height - 50 - draw_height,
