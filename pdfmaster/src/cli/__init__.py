@@ -161,6 +161,15 @@ def export_page_image(input: str, output_dir: str, page: int):
     doc.close()
     click.echo(f"Exported page {page} to {out_file}")
 
+@main.command()
+@click.argument("input", type=click.Path(exists=True))
+@click.argument("output", type=click.Path())
+@click.option("--text", default="Draft", help="Watermark text to apply")
+def watermark(input: str, output: str, text: str):
+    """Apply a text watermark across all pages of a PDF."""
+    from pdfmaster.src.watermark import add_watermark
+    add_watermark(input, output, text)
+    click.echo(f"Watermark applied to: {output}")
 
 @main.command()
 @click.argument("input", type=click.Path(exists=True))
