@@ -7,17 +7,14 @@ import sys
 
 
 def main():
-    """Launch PDF Master with premium UI"""
-    # Check for --classic flag to use legacy UI
-    if "--classic" in sys.argv:
-        from pdfmaster.ui.main import main as classic_main
+    """Launch PDF Master UI.
 
-        classic_main()
-    else:
-        # Default to premium UI
-        from pdfmaster.ui.premium_main import main as premium_main
-
-        premium_main()
+    Currently defaults to the premium UI. In the future, this can branch
+    to a classic UI path if/when such a separation is implemented.
+    """
+    # Import and launch the premium UI module
+    from pdfmaster.ui.main import main as premium_main
+    premium_main()
 
 
 if __name__ == "__main__":
